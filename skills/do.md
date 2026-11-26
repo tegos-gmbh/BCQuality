@@ -183,6 +183,15 @@ source-scope locations, and article-body retrieval.
 }
 ```
 
+### Tegos AL review language
+
+For Tegos AL pull request reviews, write the human-readable prose in every
+finding's `message` in German (de-DE), including the issue, its impact, and
+the recommendation. Write any `suggested-code-omission-reason` and
+`outcome-reason` in German as well. This applies to both leaf reviews and root
+consolidation, including findings added during root self-review. Do not
+translate AL identifiers, code, paths, references, JSON keys, or enum values.
+
 ### JSON validity
 
 The emitted document MUST be strict, valid JSON per [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259). Inside every string value, all double quotes MUST be escaped as `\"` and all line breaks as `\n`; other control characters MUST use their JSON escapes. This is not optional polish — it is the difference between a parseable report and one a consumer silently drops.
