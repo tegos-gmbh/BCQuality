@@ -34,4 +34,9 @@ jobs:
             echo '::error::BCQuality upstream could not be merged. Resolve the merge manually; main was not pushed.'
             exit 1
           fi
-          git push origin HEAD:refs/heads/main
+          if ! git grep -Fq 'in German (de-DE)' HEAD -- skills/do.md; then
+            echo '::error::German review instructions are missing. Neither branch was updated.'
+            exit 1
+          fi
+          # AL-Go requires a v<major>.<minor> ref. v365.2 is a rolling branch, not a tag.
+          git push --atomic origin HEAD:refs/heads/main HEAD:refs/heads/v365.2
