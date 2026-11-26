@@ -185,12 +185,15 @@ source-scope locations, and article-body retrieval.
 
 ### Tegos AL review language
 
-For Tegos AL pull request reviews, write the human-readable prose in every
-finding's `message` in German (de-DE), including the issue, its impact, and
-the recommendation. Write any `suggested-code-omission-reason` and
-`outcome-reason` in German as well. This applies to both leaf reviews and root
-consolidation, including findings added during root self-review. Do not
-translate AL identifiers, code, paths, references, JSON keys, or enum values.
+For Tegos AL pull request reviews, write all newly emitted human-readable
+prose in German (de-DE) in both leaf and root reports. Before returning the report,
+check each `findings[].message`, including the issue, impact, and recommendation,
+and any `suggested-code-omission-reason` or `outcome-reason` for English prose.
+Translate it even when a skill example or cited article is in English. During
+root consolidation, also translate any remaining non-German prose in the
+top-level findings copied from leaves. Preserve the accepted nested
+`sub-results` unchanged for audit. Do not translate AL identifiers, code,
+paths, references, JSON keys, enum values, or domain labels.
 
 ### JSON validity
 

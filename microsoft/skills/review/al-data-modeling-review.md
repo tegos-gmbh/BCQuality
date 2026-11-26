@@ -115,7 +115,9 @@ Outcome selection:
 
 ## Output
 
-Output conforms to the DO output contract. Every finding this skill emits MUST set `findings[].domain` to `"Data Modeling"`. A populated example:
+Output conforms to the DO output contract. Every finding this skill emits MUST set `findings[].domain` to `"Data Modeling"`. For Tegos AL pull request reviews, write the complete `message` and any prose explaining omitted suggestions or outcomes in German (de-DE), even when the source article is in English. Verify the prose language before emitting JSON. Keep AL identifiers, code, references, and the domain label unchanged.
+
+A populated example:
 
 ```json
 {
@@ -129,7 +131,7 @@ Output conforms to the DO output contract. Every finding this skill emits MUST s
     {
       "id": "microsoft/knowledge/data-modeling/set-last-date-modified-in-onmodify-and-onrename.md",
       "severity": "major",
-      "message": "The table updates Last Date Modified in OnModify but not OnRename, so renaming the primary key leaves the audit date stale and can hide the record from incremental integrations.",
+      "message": "Die Tabelle aktualisiert Last Date Modified in OnModify, aber nicht in OnRename. Beim Umbenennen des Primärschlüssels bleibt das Änderungsdatum unverändert; inkrementelle Integrationen können den Datensatz dadurch übersehen. Aktualisiere das Datum auch in OnRename.",
       "location": {
         "file": "src/LoyaltyMember.Table.al",
         "line": 74

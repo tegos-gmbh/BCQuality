@@ -112,7 +112,7 @@ For each sub-skill in the worklist:
 2. Capture the exact Task return as the immutable raw audit payload and primary transport. Preserve it unchanged in the leaf's private artifacts or host log before deriving a candidate. Apply only DO's bounded pre-gate normalization: when the complete raw report has no other defect, a finding has positive-integer `line`, `start-line`, and `end-line`, `start-line <= line <= end-line`, `start-line != line`, and no `suggested-code` field, copy the complete report and remove only that finding's optional `location.range`. Record the normalization separately in private run telemetry or artifacts, never in the findings-report. Validate the entire candidate through DO's existing strict acceptance gate. Accept the exact return when unchanged or the normalized candidate when it passes; otherwise record a separate failed validation result with no findings for rollup. Do not reconstruct JSON, infer fields, alter paths or references, clamp lines, normalize reversed or out-of-bounds ranges, remove a range associated with `suggested-code`, or salvage individual findings.
 3. Append the accepted findings-report, or the separate failed validation result, to `sub-results`. If its `outcome` is `failed`, stop here for this sub-skill: its findings are not reliable per the DO contract and MUST NOT be copied into the super-skill's top-level `findings[]` or counted in `summary.counts`.
 4. Otherwise, compare each entry from the sub-skill's `findings[]` with findings already rolled up. Two findings are duplicates when they point to the same file and overlapping line/range and prescribe materially the same correction, even when their knowledge-file IDs differ. Merge duplicates instead of appending both: keep the more specific domain owner, preserve that finding's optional `domain` field verbatim (including its absence), use its reference as `references[0]` and therefore as `id`, append the other references as supporting references, keep the highest severity and confidence justified by either report, and preserve one self-contained message. Article and leaf ownership notes decide specificity; do not choose by execution order.
-5. Append each non-duplicate finding, setting `from-sub-skill` to the sub-skill's `skill.id` and preserving its optional `domain` field verbatim, including its absence. For non-citation findings (those whose `id` is a skill-defined slug rather than a reference path), prefix `id` with `<from-sub-skill>:` to prevent collisions across sub-skills. Other finding fields are preserved.
+5. Append each non-duplicate finding, setting `from-sub-skill` to the sub-skill's `skill.id` and preserving its optional `domain` field verbatim, including its absence. For non-citation findings (those whose `id` is a skill-defined slug rather than a reference path), prefix `id` with `<from-sub-skill>:` to prevent collisions across sub-skills. Preserve other finding fields except for the prose translation in the final language check below.
 
 ### Agent self-review pass
 
@@ -138,7 +138,7 @@ For every candidate the agent identifies in this pass:
    - `message` is non-empty and self-contained, describing both the issue and a concrete recommendation. A consumer rendering the finding has no knowledge-file footer to fall back on.
    - `suggested-code` MUST be set when the fix is small, local, and mechanical. If a mechanical-looking finding omits it, set `suggested-code-omission-reason` with the reason (for example, the fix spans non-contiguous code or requires choosing a real production value).
 
-Leaf-level agent findings (those with `references: []` inside a sub-skill's report) are rolled up into the super-skill's top-level `findings[]` like any other sub-skill finding — they keep their `from-sub-skill: <leaf-id>` attribution and are not rewritten. They are not subject to the "MUST validate against knowledge" step above, because each leaf has already validated within its own domain.
+Leaf-level agent findings (those with `references: []` inside a sub-skill's report) are rolled up into the super-skill's top-level `findings[]` like any other sub-skill finding — they keep their `from-sub-skill: <leaf-id>` attribution and substantive meaning. They are not subject to the "MUST validate against knowledge" step above, because each leaf has already validated within its own domain.
 
 ### Suggested-code guidance
 
@@ -153,6 +153,14 @@ Calculate `summary.counts` from the final top-level `findings[]`, after failed s
 `suppressed[]` at the super-skill level remains empty. Knowledge-file-level suppression is reported by each sub-skill within its own entry in `sub-results`.
 
 Derive `outcome` using the DO rollup rules. `outcome-reason` is populated for `partial` and `failed` and SHOULD summarize per-sub-skill state, for example: *"al-security-review failed (tool timeout); al-performance-review completed."*
+
+For Tegos AL pull request reviews, verify before emission that the prose of
+every top-level finding and the top-level `outcome-reason` is in German
+(de-DE). If an accepted leaf returned English prose, translate only the
+top-level `message` and `suggested-code-omission-reason` without changing the
+finding's meaning, evidence, AL code, or metadata. This applies to both
+knowledge-backed and agent findings. Do not copy English prose from the
+structural examples below, and do not modify the nested `sub-results`.
 
 Before emitting the rollup, apply DO's consumer acceptance gate to every nested
 and top-level finding, and validate the final report with
